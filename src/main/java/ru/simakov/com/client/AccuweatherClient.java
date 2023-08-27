@@ -22,18 +22,19 @@ public class AccuweatherClient {
 
     public LocationRoot[] getTopcities(final TopCitiesCount citiesCount) {
         String httpUrl = HttpUrl.parse(BASE_URL)
-                .newBuilder()
-                .addPathSegment("currentconditions")
-                .addPathSegment("v1")
-                .addPathSegment("topcities")
-                .addPathSegment(String.valueOf(citiesCount.getValue()))
-                .addQueryParameter("apikey", apiKey)
-                .build()
-                .toString();
+            .newBuilder()
+            .addPathSegment("currentconditions")
+            .addPathSegment("v1")
+            .addPathSegment("topcities")
+            .addPathSegment(String.valueOf(citiesCount.getValue()))
+            .addQueryParameter("apikey", apiKey)
+            .build()
+            .toString();
 
         Request request = new Request.Builder()
-                .url(httpUrl)
-                .build();
+            .get()
+            .url(httpUrl)
+            .build();
         TypeReference<LocationRoot[]> locationRootTypeReference = new TypeReference<>() {
         };
 
@@ -42,17 +43,18 @@ public class AccuweatherClient {
 
     public CurrentCondition[] getCurrentConditionsByLocationKey(final String locationKey) {
         String url = HttpUrl.parse(BASE_URL)
-                .newBuilder()
-                .addPathSegment("currentconditions")
-                .addPathSegment("v1")
-                .addPathSegment(locationKey)
-                .addQueryParameter("apikey", apiKey)
-                .build()
-                .toString();
+            .newBuilder()
+            .addPathSegment("currentconditions")
+            .addPathSegment("v1")
+            .addPathSegment(locationKey)
+            .addQueryParameter("apikey", apiKey)
+            .build()
+            .toString();
 
         Request request = new Request.Builder()
-                .url(url)
-                .build();
+            .get()
+            .url(url)
+            .build();
         TypeReference<CurrentCondition[]> currentConditionsTypeReference = new TypeReference<>() {
         };
 
