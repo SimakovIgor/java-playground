@@ -10,7 +10,7 @@ public class EventService {
      * @param currentCondition the current condition to be included in the event
      */
     public void sendEvent(final CurrentCondition currentCondition) {
-        System.out.println("EventService.sendEvent: " + currentCondition);
+        //stub
     }
 
 }

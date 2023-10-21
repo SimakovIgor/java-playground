@@ -29,7 +29,7 @@ public class DataProvider {
     public static CurrentCondition prepareCurrentConditions() {
         return CurrentCondition.builder()
             .localObservationDateTime(new Date())
-            .epochTime(123456789)
+            .epochTime(123_456_789)
             .weatherText("Sunny")
             .weatherIcon(1)
             .hasPrecipitation(false)

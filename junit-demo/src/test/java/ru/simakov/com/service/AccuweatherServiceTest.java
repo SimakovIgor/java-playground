@@ -95,7 +95,6 @@ class AccuweatherServiceTest {
         var locationRoot = DataProvider.buildLocationRoot().build();
         LocationRoot[] locationRoots = {locationRoot};
         var currentCondition = DataProvider.prepareCurrentConditions();
-        System.out.println(currentCondition);
         Mockito.when(accuweatherClient.getTopcities(any(TopCitiesCount.class)))
             .thenReturn(locationRoots);
         Mockito.when(accuweatherClient.getCurrentConditionsByLocationKey(any()))
@@ -117,7 +116,7 @@ class AccuweatherServiceTest {
             .isNotNull()
             .satisfies(currentCondition1 -> assertThat(currentCondition1)
                 .extracting(CurrentCondition::getEpochTime, CurrentCondition::getWeatherText, CurrentCondition::isHasPrecipitation)
-                .containsExactly(123456789, "Sunny", false))
+                .containsExactly(123_456_789, "Sunny", false))
             .extracting(CurrentCondition::getTemperature)
             .extracting(CurrentCondition.Temperature::getImperial, CurrentCondition.Temperature::getMetric)
             .containsExactly(

@@ -1,6 +1,3 @@
-/**
- * Создал Андрей Антонов 19.08.2023 13:42
- **/
 package ru.simakov.com.model.accuweather;
 
 import lombok.Getter;

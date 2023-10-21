@@ -1,7 +1,3 @@
-/**
- * Создал Андрей Антонов 18.08.2023 11:10
- * 1:19:35
- **/
 package ru.simakov.com.model.accuweather;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

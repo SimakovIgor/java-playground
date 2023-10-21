@@ -58,6 +58,6 @@ public class AccuweatherService {
     }
 
     public void callWithException() {
-        throw new ServiceException("Smthing go wrong!");
+        throw new ServiceException("Smthing go wrong!", null);
     }
 }

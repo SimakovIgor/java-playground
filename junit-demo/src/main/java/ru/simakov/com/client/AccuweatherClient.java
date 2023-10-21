@@ -7,6 +7,7 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import ru.simakov.com.exception.ServiceException;
 import ru.simakov.com.model.accuweather.CurrentCondition;
 import ru.simakov.com.model.accuweather.LocationRoot;
 import ru.simakov.com.model.accuweather.TopCitiesCount;
@@ -62,15 +63,12 @@ public class AccuweatherClient {
     }
 
     private <T> T call(final Request request, final TypeReference<T> typeReference) {
-        try {
-            System.out.println("Sending rq... " + request);
-            Response response = okHttpClient.newCall(request).execute();
-            System.out.println("Receive rs... " + response);
+        try (Response response = okHttpClient.newCall(request).execute()) {
+            assert response.body() != null;
             String responseString = response.body().string();
-            System.out.println("Receive json... " + responseString);
             return objectMapper.readValue(responseString, typeReference);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ServiceException("Error with okHttpClient %s".formatted(e.getMessage()), e);
         }
     }
 }
