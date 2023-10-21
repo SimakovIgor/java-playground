@@ -16,6 +16,7 @@
 
     <modules>
         <module>junit-demo</module>
+        <module>sql-optimization-demo</module>
     </modules>
 
     <properties>
