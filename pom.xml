@@ -17,6 +17,7 @@
     <modules>
         <module>junit-demo</module>
         <module>sql-optimization-demo</module>
+        <module>spring-cloud-contract-test-demo</module>
     </modules>
 
     <properties>
