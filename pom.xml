@@ -18,13 +18,15 @@
         <module>junit-demo</module>
         <module>sql-optimization-demo</module>
         <module>spring-cloud-contract-test-demo</module>
+        <module>file-merge</module>
     </modules>
 
     <properties>
+        <java.version>19</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven.compiler.source>19</maven.compiler.source>
-        <maven.compiler.target>19</maven.compiler.target>
     </properties>
 
     <build>
