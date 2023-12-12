@@ -1,8 +1,7 @@
 package ru.simakov;
 
-import lombok.SneakyThrows;
-
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -14,15 +13,13 @@ import java.util.Objects;
 
 @SuppressWarnings("PMD.AssignmentInOperand")
 public class Main {
-    @SneakyThrows
-    public static void main(final String[] args) {
+    public static void main(final String[] args) throws IOException {
         Path newFilePath = Paths.get("PrideAndPrejudiceTranslate.txt");
         if (Files.exists(newFilePath)) {
             Files.delete(newFilePath);
-            Files.createFile(newFilePath);
-        } else {
-            Files.createFile(newFilePath);
         }
+
+        Files.createFile(newFilePath);
 
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
 
