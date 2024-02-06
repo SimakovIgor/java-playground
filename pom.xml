@@ -19,6 +19,7 @@
         <module>sql-optimization-demo</module>
         <module>spring-cloud-contract-test-demo</module>
         <module>file-merge</module>
+        <module>openapi</module>
     </modules>
 
     <properties>
