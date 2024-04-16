@@ -3,23 +3,23 @@
 - Средство увеличения производительности БД
 
 - Минусы
-  
+
   - Замедление записи в таблицы (Реляционные базы 80% чтения к 20% записи) [What databases should be used in applications which are read heavy, write heavy, and both? - Quora](https://www.quora.com/What-databases-should-be-used-in-applications-which-are-read-heavy-write-heavy-and-both)
-  
+
   - Дополнительные объемы дискового пространств (В среднем индексы занимают половину размера таблицы)
-  
+
   - Индексы имеют свойство распухать, особенно на часто изменяемых данных
-    
+
     - Изменение данных не изменяет строчку - новая версия строки, если устаревшие версии не нужны, то vacuum чистит место и туда прилетают новые данные. Таблицы - хорошо, а в индексах остаются пустые места (bloat). Периодически индексы приходится пересоздавать
-  
+
   - Не все индексы полезны
 
 ```sql
-SELECT  
- datname,  
- tup_fetched AS reads,  
- tup_inserted + tup_updated + tup_deleted AS writes,  
- (ROUND((tup_inserted + tup_updated + tup_deleted)::numeric / NULLIF(tup_fetched, 0), 5)) * 100 AS ratio  
+SELECT
+ datname,
+ tup_fetched AS reads,
+ tup_inserted + tup_updated + tup_deleted AS writes,
+ (ROUND((tup_inserted + tup_updated + tup_deleted)::numeric / NULLIF(tup_fetched, 0), 5)) * 100 AS ratio
 FROM pg_stat_database;
 ```
 
@@ -77,61 +77,61 @@ CREATE [ UNIQUE ] INDEX [ CONCURRENTLY ] [ [ IF NOT EXISTS ] name ] ON [ ONLY ] 
 ## Создание индекса, с чего начать?
 
 - Ориентируемся на продуктивное окружение
-  
+
   - Тестовое не соответствует реальности
-  
+
   - Обладать статистикой нагрузки на БД от запросов
-    
-    - Плохой запрос - медленный запрос? Не всегда, часто - это куча быстрых не оптимизированных запросов 
-    
-    - **pg_stat_statements** 
-      
+
+    - Плохой запрос - медленный запрос? Не всегда, часто - это куча быстрых не оптимизированных запросов
+
+    - **pg_stat_statements**
+
       - предоставляет возможность отслеживать статистику планирования и выполнения сервером всех операторов SQL
-      
+
       - Обезличенные запросы
-  
+
   - Иметь примеры запросов с параметрами
-    
-    - Для понимания входящих запросов 
-    
+
+    - Для понимания входящих запросов
+
     - Для проверки что не сделали хуже
 
 - Уметь читать статистику распределения данных (планировщик, executor)
 
 - Планировщик опирается на данные по представлению pg_stats
-  
+
   - это системная таблица, которая содержит статистическую информацию о данных в таблицах и индексах. Она используется оптимизатором запросов для принятия решений о том, каким образом выполнить запрос с максимальной эффективностью
-  
+
   - **n_distinct** - Количество уникальных значений
-  
+
   - **correlation** - Упорядоченность значений (корреляция между значениями столбца и значениями других столбцов)
-  
+
   - **null_frac** - Объемы null
-  
+
   - **most_common_vals** и **most_common_freq** - Частые значения
 
 ## Типы индексов
 
 1. **btree** [B-tree / Хабр](https://habr.com/ru/articles/114154/)
-   
+
    1. Наиболее распространенный тип индексов
-   
+
    2. Алгоритмы работы и модель хранения улучшается
-   
+
    3. Покрывает 90% задач
-   
+
    4. Легко создать ориентируясь на статистику
 
 2. **hash**
-   
+
    1. btree работает быстрее чем hash
-   
+
    2. Раньше были ограничения на дисках, занимает меньше времени
-   
-   3. Обслуживает операцию равенства, а btree операцию сравнения (Позволяет делать сортировку по индексу, по hash сортировки нет) и равенства 
+
+   3. Обслуживает операцию равенства, а btree операцию сравнения (Позволяет делать сортировку по индексу, по hash сортировки нет) и равенства
 
 3. **gist**
-   
+
    1. Полезен для гео данных
 
 ```sql
@@ -156,7 +156,19 @@ ORDER BY pg_class.reltuples DESC;
 ```
 
 ```sql
--- Статистика испольования индексов в разрезе схем и таблиц
+-- Статистика по частым/медленным запросам
+select
+    round(total_time::numeric, 3) as total_time_ms,
+    calls as calls_count,
+    round(mean_time::numeric, 3) as average_time_ms,
+    query
+from pg_stat_statements
+order by total_time desc
+limit 20::integer;
+```
+
+```sql
+-- Статистика испольования индексов в разрезе схем и таблиц (sec_scan, idx_scan, row_number)
 with tables_without_indexes as (
     select
         relname::text as table_name,
@@ -165,20 +177,21 @@ with tables_without_indexes as (
         coalesce(seq_scan, 0) as seq_scan,
         coalesce(idx_scan, 0) as idx_scan
     from pg_stat_all_tables
-    where
-            pg_relation_size(schemaname || '.' || relname::regclass) > 5::integer * 8192 and /*skip small tables*/
-            relname not in ('databasechangelog')
+    where relname not in ('databasechangelog')
 )
 select
-       schemaname,
-       relname,
-       seq_scan,
-       idx_scan
-from pg_stat_all_tables
-where (seq_scan + idx_scan) > 100::integer and -- table in use
-        seq_scan > 0 and -- too much sequential scans
-        schemaname not in ('pg_catalog', 'pg_toast')
-order by schemaname, seq_scan desc;
+    pg_stat.schemaname,
+    pg_stat.relname,
+    pg_stat.seq_scan,
+    pg_stat.idx_scan,
+    pg_cl.reltuples::integer AS num_rows
+from pg_stat_all_tables AS pg_stat
+         left join pg_class as pg_cl on pg_stat.relname = pg_cl.relname
+where (seq_scan + idx_scan) > 2000::integer and -- table in use
+    seq_scan > 1000 and
+    pg_cl.reltuples > 3000 and
+    schemaname not in ('pg_catalog', 'pg_toast')
+order by seq_scan desc, pg_cl.reltuples desc;
 ```
 
 ```sql
@@ -222,7 +235,7 @@ ORDER BY schemaname, index_size;
 
 1. https://postgrespro.com/blog/pgsql/5969296
 
-2. [Postgres Pro Standard : Документация: 9.5: 14.1. Использование EXPLAIN : Компания Postgres Professional](https://postgrespro.ru/docs/postgrespro/9.5/using-explain) 
+2. [Postgres Pro Standard : Документация: 9.5: 14.1. Использование EXPLAIN : Компания Postgres Professional](https://postgrespro.ru/docs/postgrespro/9.5/using-explain)
 
 3. [Андрей Сальников — Индексы в PostgreSQL. Как понять, что создавать - YouTube](https://www.youtube.com/watch?v=ju9F8OvnL4E&t=1604s)
 
