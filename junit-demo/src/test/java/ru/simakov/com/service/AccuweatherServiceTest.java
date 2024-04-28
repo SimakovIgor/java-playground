@@ -72,12 +72,13 @@ class AccuweatherServiceTest {
 
         //WHEN
         var result = accuweatherService.getTopCityLocation(topCitiesCount);
+
+        //THEN
         assertThat(result)
             .usingRecursiveComparison()
             .ignoringFields("englishName")
             .isEqualTo(locationRoot);
 
-        //THEN
         Mockito.verify(accuweatherClient).getTopcities(topCitiesCount);
     }
 
