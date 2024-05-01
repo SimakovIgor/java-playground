@@ -48,14 +48,14 @@ class AssertJCommonExampleTest {
 
     @Data
     @Builder
-    private static class Book {
+    private static final class Book {
         private String title;
         private String author;
     }
 
     @Data
     @Builder
-    private static class BookDto {
+    private static final class BookDto {
         private String title;
         private String author;
     }

@@ -40,15 +40,15 @@ class AccuweatherServiceTest {
     @Test
     void getCurrentConditionByLocationShouldWork() {
         //GIVEN
-        var currentCondition = Mockito.mock(CurrentCondition.class);
-        CurrentCondition[] currentConditions = {currentCondition};
+        final CurrentCondition currentCondition = Mockito.mock(CurrentCondition.class);
+        final CurrentCondition[] currentConditions = {currentCondition};
 
-        var request = DataProvider.prepareLocationRoot().build();
+        final LocationRoot request = DataProvider.prepareLocationRoot().build();
         Mockito.when(accuweatherClient.getCurrentConditionsByLocationKey(request.getKey()))
             .thenReturn(currentConditions);
 
         //WHEN
-        var result = accuweatherService.getCurrentConditionByLocation(request);
+        final CurrentCondition result = accuweatherService.getCurrentConditionByLocation(request);
         assertThat(result).isEqualTo(currentCondition);
 
         //THEN
@@ -64,14 +64,14 @@ class AccuweatherServiceTest {
     )
     void getTopCityLocationShouldWork(final TopCitiesCount topCitiesCount) {
         //GIVEN
-        var locationRoot = DataProvider.buildLocationRoot().build();
-        LocationRoot[] locationRoots = {locationRoot};
+        final LocationRoot locationRoot = DataProvider.buildLocationRoot().build();
+        final LocationRoot[] locationRoots = {locationRoot};
 
         Mockito.when(accuweatherClient.getTopcities(any(TopCitiesCount.class)))
             .thenReturn(locationRoots);
 
         //WHEN
-        var result = accuweatherService.getTopCityLocation(topCitiesCount);
+        final LocationRoot result = accuweatherService.getTopCityLocation(topCitiesCount);
 
         //THEN
         assertThat(result)
@@ -93,9 +93,9 @@ class AccuweatherServiceTest {
     @Test
     void checkAccuweatherShouldWork() {
         //GIVEN
-        var locationRoot = DataProvider.buildLocationRoot().build();
-        LocationRoot[] locationRoots = {locationRoot};
-        var currentCondition = DataProvider.prepareCurrentConditions();
+        final LocationRoot locationRoot = DataProvider.buildLocationRoot().build();
+        final LocationRoot[] locationRoots = {locationRoot};
+        final CurrentCondition currentCondition = DataProvider.prepareCurrentConditions();
         Mockito.when(accuweatherClient.getTopcities(any(TopCitiesCount.class)))
             .thenReturn(locationRoots);
         Mockito.when(accuweatherClient.getCurrentConditionsByLocationKey(any()))
@@ -111,7 +111,8 @@ class AccuweatherServiceTest {
     }
 
     private void verifySendEvent() {
-        var captor = ArgumentCaptor.forClass(CurrentCondition.class);
+        final ArgumentCaptor<CurrentCondition> captor =
+            ArgumentCaptor.forClass(CurrentCondition.class);
         Mockito.verify(eventService).sendEvent(captor.capture());
         assertThat(captor.getValue())
             .isNotNull()
