@@ -157,14 +157,21 @@ ORDER BY pg_class.reltuples DESC;
 
 ```sql
 -- Статистика по частым/медленным запросам
-select
-    round(total_time::numeric, 3) as total_time_ms,
-    calls as calls_count,
-    round(mean_time::numeric, 3) as average_time_ms,
-    query
+select round(total_time::numeric, 3) as total_time_ms,
+       calls                         as calls_count,
+       round(mean_time::numeric, 3)  as average_time_ms,
+       query
 from pg_stat_statements
 order by total_time desc
 limit 20::integer;
+
+-- or
+
+SELECT userid::regrole, dbid, query, total_exec_time
+FROM pg_stat_statements
+ORDER BY total_exec_time
+        DESC
+LIMIT 10;
 ```
 
 ```sql
